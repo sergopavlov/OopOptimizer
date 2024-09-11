@@ -2,6 +2,7 @@
 using Interfaces.Functionals;
 using Interfaces.Functions;
 using Interfaces.Optimizators;
+using Optimizators.LinearAlgebra;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Optimizators;
 /// </summary>
 public class ConjugateGradientOptimizator : IOptimizator<IDifferentiableFunctional, IDifferentiableFunction>
 {
+    private readonly ILinearAlgebra la = new LinearAlgebra.LinearAlgebra();
     public int Maxiter { get; set; } = 10000;
     public double TargetEps { get; set; } = 1e-12;
     public IVector Minimize(IDifferentiableFunctional objective, IParametricFunction<IDifferentiableFunction> function, IVector initialParameters, IVector? minimumParameters = null, IVector? maximumParameters = null)
@@ -33,7 +35,7 @@ public class ConjugateGradientOptimizator : IOptimizator<IDifferentiableFunction
 
         currentFunction = function.Bind(currentParams);
         var currentValue = objective.Value(currentFunction);
-        double lastGradNorm = Dot(grad, grad);
+        double lastGradNorm = la.VecVec(grad, grad);
         var direction = new Vector();
         for (int i = 0; i < n; i++)
         {
@@ -42,7 +44,7 @@ public class ConjugateGradientOptimizator : IOptimizator<IDifferentiableFunction
         for (int i = 0; i < Maxiter && currentValue > TargetEps; i++)
         {
             grad = objective.Gradient(currentFunction);
-            var curGradNorm = Dot(grad, grad);
+            var curGradNorm = la.VecVec(grad, grad);
             double beta = curGradNorm / lastGradNorm;
             Parallel.For(0, n, j =>
             {
@@ -55,13 +57,5 @@ public class ConjugateGradientOptimizator : IOptimizator<IDifferentiableFunction
         }
         return currentParams;
     }
-    private double Dot(IVector left, IVector right)
-    {
-        double result = 0;
-        for (int i = 0; i < left.Count; i++)
-        {
-            result += left[i] * right[i];
-        }
-        return result;
-    }
+    
 }

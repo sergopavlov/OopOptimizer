@@ -2,6 +2,7 @@
 using Interfaces.Functionals;
 using Interfaces.Functions;
 using Interfaces.Optimizators;
+using Optimizators.LinearAlgebra;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Optimizators;
 /// </summary>
 public class GaussNewtonOptimizator : IOptimizator<ILeastSquaresFunctional, IDifferentiableFunction>
 {
+    private readonly ILinearAlgebra la = new LinearAlgebra.LinearAlgebra();
     public int Maxiter { get; set; } = 10000;
     public double TargetEps { get; set; } = 1e-12;
     public IVector Minimize(ILeastSquaresFunctional objective, IParametricFunction<IDifferentiableFunction> function, IVector initialParameters, IVector? minimumParameters = null, IVector? maximumParameters = null)
@@ -30,11 +32,11 @@ public class GaussNewtonOptimizator : IOptimizator<ILeastSquaresFunctional, IDif
         while (k < Maxiter && currentValue > TargetEps)
         {
             var jacobi = objective.Jacobian(fun);
-            var jacobiT = Transpose(jacobi);
-            var mat = MatMat(jacobiT, jacobi);
+            var jacobiT = la.Transpose(jacobi);
+            var mat = la.MatMat(jacobiT, jacobi);
             var dparam = objective.Residual(fun);
-            dparam = MatVec(jacobiT, dparam);
-            dparam = SolveSLAE(mat, dparam);
+            dparam = la.MatVec(jacobiT, dparam);
+            dparam = la.SolveSLAE(mat, dparam);
             for (int i = 0; i < n; i++)
             {
                 currentParameters[i] -= dparam[i];
@@ -44,23 +46,5 @@ public class GaussNewtonOptimizator : IOptimizator<ILeastSquaresFunctional, IDif
             k++;
         }
         return currentParameters;
-    }
-
-    private IMatrix Transpose(IMatrix m)
-    {
-        throw new NotImplementedException();
-    }
-    private IMatrix MatMat(IMatrix m1, IMatrix m2)
-    {
-
-        throw new NotImplementedException();
-    }
-    private IVector MatVec(IMatrix m, IVector v)
-    {
-        throw new NotImplementedException();
-    }
-    private IVector SolveSLAE(IMatrix m, IVector rhs)
-    {
-        throw new NotImplementedException();
     }
 }
