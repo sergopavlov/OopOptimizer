@@ -26,10 +26,10 @@ public class ConjugateGradientOptimizator : IOptimizator<IDifferentiableFunction
         }
         var currentFunction = function.Bind(currentParams);
         var grad = objective.Gradient(currentFunction);
-        for (int i = 0; i < n; i++)
+        Parallel.For(0, n, i =>
         {
             currentParams[i] -= grad[i];
-        }
+        });
 
         currentFunction = function.Bind(currentParams);
         var currentValue = objective.Value(currentFunction);
@@ -44,11 +44,11 @@ public class ConjugateGradientOptimizator : IOptimizator<IDifferentiableFunction
             grad = objective.Gradient(currentFunction);
             var curGradNorm = Dot(grad, grad);
             double beta = curGradNorm / lastGradNorm;
-            for (int j = 0; j < n; j++)
+            Parallel.For(0, n, j =>
             {
                 direction[j] = -grad[j] + beta * direction[j];
                 currentParams[j] += direction[j];
-            }
+            });
             lastGradNorm = curGradNorm;
             currentFunction = function.Bind(currentParams);
             currentValue = objective.Value(currentFunction);
