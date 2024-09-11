@@ -6,3 +6,4 @@ using System.Threading.Tasks;
 
 namespace Interfaces.DataStorage;
 public interface IMatrix : IList<IList<double>> { }
+public class Matrix : List<IList<double>>, IMatrix { }
