@@ -13,21 +13,24 @@ namespace Functions;
 /// </summary>
 public class CubicInterpolationHermitSplineFunction : IParametricFunction<IFunction>
 {
+   private IVector _mesh { get; set; }
    class InternalCubicInterpolationHermitSplineFunction : IFunction
    {
+      private IVector _mesh { get; set; }
       private IVector _parameters { get; set; }
-      public InternalCubicInterpolationHermitSplineFunction(IVector parameters)
+      public InternalCubicInterpolationHermitSplineFunction(IVector parameters, IVector mesh)
       {
-         if (parameters.Count % 3 != 0 && parameters.Count<6)
-            throw new ArgumentException("Incorrect mesh");
+         if (parameters.Count != mesh.Count * 2)
+            throw new ArgumentException("Incorrect weights binded");
          _parameters = parameters;
+         _mesh = mesh;
       }
       double GetValueAtPoint(double point)
       {
          double x1, x2, y1, y2, q1, q2;
          try
          {
-            (x1, x2, y1, y2, q1, q2) = FindIntervalHermit(_parameters, point);
+            (x1, x2, y1, y2, q1, q2) = FindIntervalHermit(point);
          }
          catch
          {
@@ -57,21 +60,18 @@ public class CubicInterpolationHermitSplineFunction : IParametricFunction<IFunct
             throw new ArgumentException("The dimensionality of the space does not match the type of function.");
          return GetValueAtPoint(point[0]);
       }
-      (double xk, double xk1, double yk, double yk1, double qk, double qk1) FindIntervalHermit(IVector data, double input)
+      (double xk, double xk1, double yk, double yk1, double qk, double qk1) FindIntervalHermit(double input)
       {
-         for (int i = 0; i < data.Count - 3; i += 3)
+         int ind = Array.BinarySearch(_mesh.ToArray(), input);
+         if (ind < 0)
+            ind = ~ind;
+         try
          {
-            double xk = data[i];
-            double yk = data[i + 1];
-            double qk = data[i + 2];
-            double xk1 = data[i + 3];
-            double yk1 = data[i + 4];
-            double qk1 = data[i + 5];
-
-            if (input >= xk && input <= xk1)
-            {
-               return (xk, xk1, yk, yk1, qk, qk1);
-            }
+            return (_mesh[ind - 1], _mesh[ind], _parameters[2*ind-2], _parameters[2*ind], _parameters[2*ind-1], _parameters[2*ind+1]);
+         }
+         catch
+         {
+            throw new ArgumentException("input not inside mesh");
          }
 
          throw new ArgumentException("input not inside mesh");
@@ -87,6 +87,12 @@ public class CubicInterpolationHermitSplineFunction : IParametricFunction<IFunct
    {
       if (parameters.Count < 1)
          throw new ArgumentException("Empty list of coefficients. Please provide coefficients for the linear function.");
-      return new InternalCubicInterpolationHermitSplineFunction(parameters);
+      return new InternalCubicInterpolationHermitSplineFunction(parameters, _mesh);
+   }
+   public CubicInterpolationHermitSplineFunction(IVector mesh)
+   {
+      if (mesh.Count < 2)
+         throw new ArgumentException("Incorrect mesh");
+      _mesh = mesh;
    }
 }

@@ -15,11 +15,13 @@ public class PolyLinearFunction : IParametricFunction<IDifferentiableFunction>
    class InternalPolyLinearFunction : IDifferentiableFunction
    {
       private IVector _parameters { get; set; }
-      public InternalPolyLinearFunction(IVector parameters) 
+      private IVector _mesh { get; set; }
+      public InternalPolyLinearFunction(IVector parameters, IVector mesh)
       {
-         if (parameters.Count % 2 != 0 && parameters.Count < 4)
-            throw new ArgumentException("Incorrect mesh");
+         if (parameters.Count != mesh.Count)
+            throw new ArgumentException("Incorrect weights binded");
          _parameters = parameters;
+         _mesh = mesh;
       }
       public IVector Gradient(IVector point)
       {
@@ -29,15 +31,28 @@ public class PolyLinearFunction : IParametricFunction<IDifferentiableFunction>
             throw new ArgumentException("The dimensionality of the space does not match the type of function.");
          try
          {
-            (double x1, double x2, double y1, double y2) = FindInterval(_parameters, point[0]);
-            return new Vector() {(y2-y1) /(x2-x1)};
+            int ind;
+            (double x1, double x2, double y1, double y2) = FindInterval(point[0], out ind);
+            Vector res = new Vector();
+            res.AddRange(new double[_parameters.Count]);
+            res[ind - 1] = (x2-point[0])/(x2-x1);
+            res[ind]     = (point[0]-x1)/(x2-x1);
+            return res;
          }
          catch
          {
+            Vector res = new Vector();
+            res.AddRange(new double[_parameters.Count]);
             if (point[0] < _parameters[0])
-               return new Vector() { _parameters[1]};
+            {
+               res[0] = 1;
+               return res;
+            }
             else //(point[^2]>_parameters[^1])
-               return new Vector() { _parameters[^1]};
+            {
+               res[^1] = 1;
+               return res;
+            }
          };
       }
       /// <summary>
@@ -50,11 +65,12 @@ public class PolyLinearFunction : IParametricFunction<IDifferentiableFunction>
       {
          if (_parameters.Count < 1)
             throw new ArgumentException("Parameters are not bound. Please call the 'bind' method first.");
-         if ( point.Count != 1)
+         if (point.Count != 1)
             throw new ArgumentException("The dimensionality of the space does not match the type of function.");
-         try 
+         try
          {
-            (double x1, double x2, double y1, double y2) = FindInterval(_parameters, point[0]);
+            int ind;
+            (double x1, double x2, double y1, double y2) = FindInterval(point[0], out ind);
             return y1 + (y2 - y1) / (x2 - x1) * (point[0] - x1);
          }
          catch
@@ -65,34 +81,38 @@ public class PolyLinearFunction : IParametricFunction<IDifferentiableFunction>
                return _parameters[^1];
          }
       }
-      (double xk, double xk1, double yk, double yk1) FindInterval(IVector data, double input)
+      (double xk, double xk1, double yk, double yk1) FindInterval(double input, out int ind)
       {
-         for (int i = 0; i < data.Count - 2; i += 2)
+         ind = Array.BinarySearch(_mesh.ToArray(), input);
+         if (ind < 0)
+            ind = ~ind;
+         try
          {
-            double xk = data[i];
-            double yk = data[i + 1];
-            double xk1 = data[i + 2];
-            double yk1 = data[i + 3];
-
-            if (input >= xk && input <= xk1)
-            {
-               return (xk, xk1, yk, yk1);
-            }
+            return (_mesh[ind - 1], _mesh[ind], _parameters[ind - 1], _parameters[ind]);
          }
-
-         throw new ArgumentException("input not inside mesh");
+         catch
+         {
+            throw new ArgumentException("input not inside mesh");
+         }
       }
    }
    /// <summary>
    /// f(x)=(y_{k}-y_{k-1})/(x_{k}-x_{k-1})*(x-x_{k-1}) + y_{k-1}
    /// </summary>
-   /// <param name="parameters">{x0, y0, x1, y1, ..., xn, yn }</param>
+   /// <param name="parameters">{y0, y1, ..., yn }</param>
    /// <returns></returns>
    /// <exception cref="ArgumentException"></exception>
    public IDifferentiableFunction Bind(IVector parameters)
    {
       if (parameters.Count < 1)
          throw new ArgumentException("Empty list of coefficients. Please provide coefficients for the linear function.");
-      return new InternalPolyLinearFunction(parameters);
+      return new InternalPolyLinearFunction(parameters, _mesh);
+   }
+   private IVector _mesh { get; set; }
+   public PolyLinearFunction(IVector mesh)
+   {
+      if (mesh.Count < 2)
+         throw new ArgumentException("Incorrect mesh");
+      _mesh = mesh;
    }
 }

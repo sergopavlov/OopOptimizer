@@ -23,11 +23,21 @@ public class LinearFunction : IParametricFunction<IDifferentiableFunction>
       {
          _parameters = parameters;
       }
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="point"></param>
+      /// <returns>{f'b, f'k1, f'k2, ..., f'k3}</returns>
+      /// <exception cref="ArgumentException"></exception>
       public IVector Gradient(IVector point)
       {
          if (_parameters.Count < 1)
             throw new ArgumentException("Parameters are not bound. Please call the 'bind' method first.");
-         return (IVector)_parameters.Skip(1).ToList();
+         Vector tmp = new();
+         tmp.Add(1);
+         Vector res = new();
+         res.AddRange(tmp.Concat(point).ToArray());
+         return res;
       }
       /// <summary>
       /// f(x1,x2,...,xn) = a0+a1*x1+a2*x2+...+an*xn
