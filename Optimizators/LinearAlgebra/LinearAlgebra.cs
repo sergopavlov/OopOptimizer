@@ -4,6 +4,9 @@ namespace Optimizators.LinearAlgebra;
 
 internal class LinearAlgebra : ILinearAlgebra
 {
+    public int SolverMaxIter { get; set; } = 10000;
+    public double SolverEps { get; set; } = 1e-15;
+
     public IMatrix MatMat(IMatrix mat1, IMatrix mat2)
     {
         int n = mat1.Count;
@@ -42,7 +45,47 @@ internal class LinearAlgebra : ILinearAlgebra
     }
     public IVector SolveSLAE(IMatrix m, IVector rhs)
     {
-        throw new NotImplementedException();
+        int n = rhs.Count;
+
+        double alpha, beta;
+        double squareNorm;
+        Vector q = [.. Enumerable.Repeat(0.0, n)];
+        Vector z = new();
+        IVector r = MatVec(m, q);
+        for (int i = 0; i < n; i++)
+        {
+            r[i] = rhs[i] - r[i];
+            z.Add(r[i]);
+        }
+
+        IVector p = MatVec(m, z);
+        IVector tmp;
+
+        squareNorm = VecVec(r, r);
+
+        for (int index = 0; index < SolverMaxIter && squareNorm > SolverEps; index++)
+        {
+            alpha = VecVec(p, r) / VecVec(p, p);
+            for (int i = 0; i < n; i++)
+            {
+                q[i] += alpha * z[i];
+            }
+            squareNorm = VecVec(r,r) - (alpha * alpha) * VecVec(p, p);
+            for (int i = 0; i < n; i++)
+            {
+                r[i] -= alpha * p[i];
+            }
+
+            tmp = MatVec(m,r);
+
+            beta = - VecVec(p , tmp) / VecVec(p , p);
+            for (int i = 0; i < n; i++)
+            {
+                z[i] = r[i]+ beta * z[i];
+                    p[i]= tmp[i]+beta * p[i];
+            }
+        }
+        return q;
     }
 
     public IMatrix Transpose(IMatrix mat)
