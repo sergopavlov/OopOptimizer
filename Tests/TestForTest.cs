@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Tests;
 public class TestForTest
 {
-    [Fact]
-    public void test()
-    {
-        Assert.True(true);
-    }
+   [Fact]
+   public void test()
+   {
+      Assert.True(true);
+   }
 }
