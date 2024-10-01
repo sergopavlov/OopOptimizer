@@ -34,13 +34,13 @@ public class CubicInterpolationHermitSplineFunction : IParametricFunction<IFunct
          }
          catch
          {
-            if (point < _parameters[0])
+            if (point <= _mesh[0])
             {
-               return _parameters[2] * point + _parameters[1] - _parameters[2] * _parameters[0];
+               return _parameters[1] * (point - _mesh[0]) + _parameters[0];
             }
-            else//point > _parameters[^3]
+            else//point > _mesh[^1]
             {
-               return _parameters[^1] * point + _parameters[^2] - _parameters[^1] * _parameters[^3];
+               return _parameters[^1] * (point - _mesh[^1]) + _parameters[^2];
             }
          }
          double res = 0;
@@ -80,7 +80,7 @@ public class CubicInterpolationHermitSplineFunction : IParametricFunction<IFunct
    /// <summary>
    /// 
    /// </summary>
-   /// <param name="parameters">{x0,y0,y'0,x1,y1,y'1,...,xn,yn,y'n}</param>
+   /// <param name="parameters">{y0,y'0,y1,y'1,...,yn,y'n}</param>
    /// <returns></returns>
    /// <exception cref="ArgumentException"></exception>
    public IFunction Bind(IVector parameters)
