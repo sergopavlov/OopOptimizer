@@ -5,6 +5,9 @@ using Interfaces.Functions;
 namespace Tests.FunctionsTests.Common;
 
 // ReSharper disable once ClassNeverInstantiated.Global
+/// <summary>
+/// Fixture for interpolation Hermite spline function.
+/// </summary>
 public sealed record InterpolationHermiteSplineFunctionFixture
 {
     private readonly CubicInterpolationHermitSplineFunction _function;
@@ -13,7 +16,7 @@ public sealed record InterpolationHermiteSplineFunctionFixture
     public InterpolationHermiteSplineFunctionFixture()
     {
         IVector mesh = new Vector { 0.0, 1.0, 2.0 };
-        _parameters = new Vector { 0.0, 0.0, 1.0, 1.0, 4.0, 0.0 }; 
+        _parameters = new Vector { 0.0, 0.0, 1.0, 1.0, 4.0, 0.0 };
         _function = new(mesh);
     }
 

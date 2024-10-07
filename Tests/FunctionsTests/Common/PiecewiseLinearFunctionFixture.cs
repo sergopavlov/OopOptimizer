@@ -5,6 +5,9 @@ using Interfaces.Functions;
 namespace Tests.FunctionsTests.Common;
 
 // ReSharper disable once ClassNeverInstantiated.Global
+/// <summary>
+/// Fixture for piecewise linear function.
+/// </summary>
 public sealed record PiecewiseLinearFunctionFixture
 {
     private readonly PolyLinearFunction _function;

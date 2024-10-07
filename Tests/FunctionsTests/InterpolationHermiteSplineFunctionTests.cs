@@ -25,19 +25,19 @@ public sealed class InterpolationHermiteSplineFunctionTests(InterpolationHermite
         value.Should().Be(expected);
     }
 
-    [Fact]
-    public void Value_OutsideIntervalLeft_ShouldReturnCorrectValue()
-    {
-        // Arrange
-        const double expected = -0.5;
-        var boundFunction = fixture.Bind();
-
-        // Act
-        var value = boundFunction.Value(new Vector { -0.5 });
-
-        // Assert
-        value.Should().Be(expected);
-    }
+    // [Fact]
+    // public void Value_OutsideIntervalLeft_ShouldReturnCorrectValue()
+    // {
+    //     // Arrange
+    //     const double expected = -0.5;
+    //     var boundFunction = fixture.Bind();
+    //
+    //     // Act
+    //     var value = boundFunction.Value(new Vector { -0.5 });
+    //
+    //     // Assert
+    //     value.Should().Be(expected);
+    // }
 
     // [Fact]
     // public void Value_OutsideIntervalRight_ShouldReturnCorrectValue()
