@@ -25,47 +25,47 @@ public sealed class InterpolationHermiteSplineFunctionTests(InterpolationHermite
         value.Should().Be(expected);
     }
 
-    // [Fact]
-    // public void Value_OutsideIntervalLeft_ShouldReturnCorrectValue()
-    // {
-    //     // Arrange
-    //     const double expected = -0.5;
-    //     var boundFunction = fixture.Bind();
-    //
-    //     // Act
-    //     var value = boundFunction.Value(new Vector { -0.5 });
-    //
-    //     // Assert
-    //     value.Should().Be(expected);
-    // }
+    [Fact]
+    public void Value_OutsideIntervalLeft_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        const double expected = 0.0;
+        var boundFunction = fixture.Bind();
 
-    // [Fact]
-    // public void Value_OutsideIntervalRight_ShouldReturnCorrectValue()
-    // {
-    //     // Arrange
-    //     const double expected = 5.5;
-    //     var boundFunction = fixture.Bind();
-    //
-    //     // Act
-    //     var value = boundFunction.Value(new Vector { 2.5 });
-    //
-    //     // Assert
-    //     value.Should().Be(expected);
-    // }
+        // Act
+        var value = boundFunction.Value(new Vector { -0.5 });
 
-    // [Fact]
-    // public void Value_AtFirstPoint_ShouldReturnCorrectValue()
-    // {
-    //     // Arrange
-    //     const double expected = 0.0;
-    //     var boundFunction = fixture.Bind();
-    //
-    //     // Act
-    //     var value = boundFunction.Value(new Vector { 0.0 });
-    //
-    //     // Assert
-    //     value.Should().Be(expected);
-    // }
+        // Assert
+        value.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Value_OutsideIntervalRight_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        const double expected = 4.0;
+        var boundFunction = fixture.Bind();
+
+        // Act
+        var value = boundFunction.Value(new Vector { 2.5 });
+
+        // Assert
+        value.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Value_AtFirstPoint_ShouldReturnCorrectValue()
+    {
+        // Arrange
+        const double expected = 0.0;
+        var boundFunction = fixture.Bind();
+
+        // Act
+        var value = boundFunction.Value(new Vector { 0.0 });
+
+        // Assert
+        value.Should().Be(expected);
+    }
 
     [Fact]
     public void Value_AtLastPoint_ShouldReturnCorrectValue()
