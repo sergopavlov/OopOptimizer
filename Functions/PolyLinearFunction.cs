@@ -76,7 +76,7 @@ public class PolyLinearFunction : IParametricFunction<IDifferentiableFunction>
          catch
          {
             if (point[0] < _parameters[0])
-               return _parameters[1];
+               return _parameters[0];
             else //(point[^2]>_parameters[^1])
                return _parameters[^1];
          }
